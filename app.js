@@ -64,6 +64,7 @@ function escapeHtml(s) {
 
 // UI glue
 const state = { presets: [] };
+const loadedContainer = document.getElementById('loaded');
 
 document.getElementById('files').addEventListener('change', async (e) => {
   const files = Array.from(e.target.files);
@@ -73,22 +74,63 @@ document.getElementById('files').addEventListener('change', async (e) => {
     const parsed = parsePreset(txt);
     state.presets.push({ fileName: f.name, ...parsed });
   }
+  // select first two by default when loading
+  state.presets.forEach((p, i) => p.selected = i < 2);
   renderLoaded();
 });
 
 function renderLoaded() {
-  const container = document.getElementById('loaded');
-  container.innerHTML = '';
+  loadedContainer.innerHTML = '';
   state.presets.forEach((p, i) => {
     const div = document.createElement('div');
     div.className = 'presetItem';
-    div.innerHTML = `<label><input type="checkbox" data-idx="${i}" ${i<2? 'checked' : ''}> <strong>${escapeHtml(p.presetName || p.fileName)}</strong> — ${p.mods.length} mods</label>`;
-    container.appendChild(div);
+    const upDisabled = i === 0 ? 'disabled' : '';
+    const downDisabled = i === state.presets.length - 1 ? 'disabled' : '';
+    div.innerHTML = `
+      <button class="moveUp" data-idx="${i}" ${upDisabled}>↑</button>
+      <button class="moveDown" data-idx="${i}" ${downDisabled}>↓</button>
+      <label>
+        <input type="checkbox" data-idx="${i}" ${p.selected ? 'checked' : ''}>
+        <strong>${escapeHtml(p.presetName || p.fileName)}</strong> — ${p.mods.length} mods
+      </label>
+    `;
+    loadedContainer.appendChild(div);
   });
 }
 
+// Handle selection toggles and move buttons via event delegation
+loadedContainer.addEventListener('change', (e) => {
+  if (e.target && e.target.matches('input[type=checkbox]')) {
+    const idx = parseInt(e.target.dataset.idx, 10);
+    if (!Number.isNaN(idx) && state.presets[idx]) state.presets[idx].selected = e.target.checked;
+  }
+});
+
+function swapPresets(i, j) {
+  const tmp = state.presets[i];
+  state.presets[i] = state.presets[j];
+  state.presets[j] = tmp;
+}
+
+loadedContainer.addEventListener('click', (e) => {
+  const t = e.target;
+  if (t.matches('button.moveUp')) {
+    const idx = parseInt(t.dataset.idx, 10);
+    if (!Number.isNaN(idx) && idx > 0) {
+      swapPresets(idx, idx - 1);
+      renderLoaded();
+    }
+  } else if (t.matches('button.moveDown')) {
+    const idx = parseInt(t.dataset.idx, 10);
+    if (!Number.isNaN(idx) && idx < state.presets.length - 1) {
+      swapPresets(idx, idx + 1);
+      renderLoaded();
+    }
+  }
+});
+
 document.getElementById('run').addEventListener('click', () => {
-  const checked = Array.from(document.querySelectorAll('#loaded input[type=checkbox]:checked')).map(cb => parseInt(cb.dataset.idx));
+  const checked = state.presets.map((p, i) => p.selected ? i : -1).filter(i => i >= 0);
   if (checked.length === 0) return alert('Select at least one preset.');
   const op = document.getElementById('op').value;
   // For binary ops we take first two selected presets (A and B)
