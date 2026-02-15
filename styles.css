@@ -1,0 +1,16 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #101216;
+  color: #eef;
+  margin: 20px;
+}
+h1 { font-weight: 400; }
+.controls { margin: 12px 0 18px 0; }
+label { display: block; margin-bottom: 6px; }
+#loaded { margin-top: 8px; }
+.presetItem { background: #1b1f28; padding: 8px; margin: 6px 0; border-radius: 4px; }
+.ops { margin-top: 8px; }
+button { margin-left: 8px; }
+.result { margin-top: 12px; background: #0f1318; padding: 12px; border-radius: 6px; }
+#resultList ul { list-style: none; padding-left: 0; }
+#resultList li { padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.04); }

@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Arma3 Preset Set Operations</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <h1>Arma 3 Preset Set Tool</h1>
+
+    <section class="controls">
+      <label>Select preset HTML files (multiple):
+        <input id="files" type="file" accept="text/html" multiple>
+      </label>
+      <div id="loaded"></div>
+      <div class="ops">
+        <select id="op">
+          <option value="union">Union</option>
+          <option value="intersection">Intersection</option>
+          <option value="difference">Difference (A \u2212 B)</option>
+        </select>
+        <button id="run">Run</button>
+        <button id="export" disabled>Export Result</button>
+      </div>
+    </section>
+
+    <section class="result">
+      <h2>Result</h2>
+      <div id="resultMeta"></div>
+      <div id="resultList"></div>
+    </section>
+
+    <script src="app.js"></script>
+  </body>
+</html>
